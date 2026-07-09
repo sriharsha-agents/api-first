@@ -1,0 +1,85 @@
+# docker-compose for local air-gapped development.
+# All services run on the private network; no external data egress.
+
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: "0.1.0"
+        BUILD_TIME: "${BUILD_TIME:-local}"
+    container_name: api-first
+    ports:
+      - "${SERVER_PORT:-8080}:8080"
+    environment:
+      - SERVER_PORT=8080
+      - SERVER_READ_TIMEOUT=5s
+      - SERVER_WRITE_TIMEOUT=10s
+      - SERVER_SHUTDOWN_TIMEOUT=5s
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=${DATABASE_USER:-postgres}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - DATABASE_NAME=${DATABASE_NAME:-apifirst}
+      - DATABASE_SSLMODE=disable
+      - DATABASE_MAX_CONNS=25
+      - DATABASE_MIN_CONNS=2
+      - DATABASE_MAX_LIFETIME=3600s
+      - REDIS_ADDR=redis:6379
+      - REDIS_DB=0
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - airgap
+
+  db:
+    image: postgres:16-alpine
+    container_name: api-first-db
+    environment:
+      - POSTGRES_USER=${DATABASE_USER:-postgres}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD:-postgres}
+      - POSTGRES_DB=${DATABASE_NAME:-apifirst}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - airgap
+
+  redis:
+    image: redis:7-alpine
+    container_name: api-first-redis
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - airgap
+
+volumes:
+  pgdata:
+  redisdata:
+
+networks:
+  airgap:
+    driver: bridge
