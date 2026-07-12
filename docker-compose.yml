@@ -1,8 +1,6 @@
 # docker-compose for local air-gapped development.
 # All services run on the private network; no external data egress.
 
-version: "3.9"
-
 services:
   api:
     build:
