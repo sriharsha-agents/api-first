@@ -9,7 +9,7 @@ WORKDIR /src
 
 # Copy dependency manifests first for layer caching.
 COPY go.mod go.sum ./
-RUN go mod download
+RUN go mod tidy
 
 # Copy source code.
 COPY . .
