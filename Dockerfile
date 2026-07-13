@@ -7,8 +7,8 @@ RUN apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /src
 
-# Copy dependency manifests first for layer caching.
-COPY go.mod go.sum ./
+# Copy dependency manifest first for layer caching.
+COPY go.mod ./
 RUN go mod tidy
 
 # Copy source code.
