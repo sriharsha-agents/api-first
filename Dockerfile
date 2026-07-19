@@ -1,18 +1,21 @@
 # ============================================
 # Stage 1: Build
 # ============================================
-FROM golang:1.21-alpine AS builder
+FROM golang:1.24-alpine AS builder
 
 RUN apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /src
 
-# Copy dependency manifest first for layer caching.
+# Copy dependency manifest first for layer caching (go.sum generated inside builder).
 COPY go.mod ./
-RUN go mod tidy
+RUN go mod download
 
 # Copy source code.
 COPY . .
+
+# Ensure dependencies are consistent with actual imports.
+RUN go mod tidy
 
 # Inject build metadata via ldflags.
 ARG VERSION=dev

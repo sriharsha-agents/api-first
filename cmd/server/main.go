@@ -20,7 +20,7 @@ import (
 
 // Build-time metadata injected via ldflags during Docker build.
 var (
-	Version   = "dev"
+	Version = "dev"
 	BuildAt = "unknown"
 )
 
@@ -32,8 +32,8 @@ func main() {
 
 	log.WithFields(map[string]interface{}{
 		"version": Version,
-		"build": BuildAt,
-		"port":  cfg.Server.Port,
+		"build":   BuildAt,
+		"port":    cfg.Server.Port,
 	}).Info("starting API-First enterprise module")
 
 	// Connect to PostgreSQL (local database, data never leaves air-gapped boundary).
@@ -73,7 +73,7 @@ func main() {
 
 	// Create HTTP server with timeouts for graceful shutdown.
 	srv := &http.Server{
-		Addr:         ":" + cfg.Server.Port,
+		Addr:           ":" + cfg.Server.Port,
 		Handler:        r,
 		ReadTimeout:    cfg.Server.ReadTimeout,
 		WriteTimeout:   cfg.Server.WriteTimeout,
@@ -84,7 +84,7 @@ func main() {
 	// Start server in a goroutine.
 	go func() {
 		log.WithField("addr", srv.Addr).Info("HTTP server listening")
-		if err := srv.Listen(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.WithError(err).Fatal("server failed to start")
 		}
 	}()
@@ -119,10 +119,10 @@ func requestLogger() gin.HandlerFunc {
 		log := logger.Logger()
 		log.WithFields(map[string]interface{}{
 			"method":     c.Request.Method,
-			"path":      path,
+			"path":       path,
 			"status":     c.Writer.Status(),
 			"latency":    time.Since(start).String(),
-			"client_ip": c.ClientIP(),
+			"client_ip":  c.ClientIP(),
 			"user_agent": c.Request.UserAgent(),
 		}).Info("request")
 	}

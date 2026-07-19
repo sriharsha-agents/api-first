@@ -18,12 +18,12 @@ func Init(cfg *config.RedisConfig) error {
 	log := logger.Logger()
 
 	client = redis.NewClient(&redis.Options{
-		Addr:         cfg.Addr,
-		Password:       cfg.Password,
-		DB:           cfg.DB,
-		MinIdleConns: cfg.MinIdleConns,
-		MaxIdleConns: cfg.MaxIdleConns,
-		MaxIdleTime:  cfg.MaxIdleTime,
+		Addr:            cfg.Addr,
+		Password:        cfg.Password,
+		DB:              cfg.DB,
+		MinIdleConns:    cfg.MinIdleConns,
+		MaxIdleConns:    cfg.MaxIdleConns,
+		ConnMaxIdleTime: cfg.MaxIdleTime,
 	})
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

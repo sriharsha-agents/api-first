@@ -11,7 +11,6 @@ import (
 	"api-first/internal/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -81,7 +80,7 @@ func ReadinessCheck(db *gorm.DB) gin.HandlerFunc {
 			c.JSON(http.StatusServiceUnavailable, gin.H{
 				"status":    status,
 				"database":  dbStatus,
-				"redis":   redisStatus,
+				"redis":     redisStatus,
 				"timestamp": time.Now().UTC().Format(time.RFC3339),
 			})
 			return
@@ -90,7 +89,7 @@ func ReadinessCheck(db *gorm.DB) gin.HandlerFunc {
 		c.JSON(http.StatusOK, gin.H{
 			"status":    status,
 			"database":  dbStatus,
-			"redis":   redisStatus,
+			"redis":     redisStatus,
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		})
 	}
@@ -242,7 +241,7 @@ func (h *Handler) CreateDeployment(c *gin.Context) {
 		return
 	}
 
-	log.WithFields(gin.H{
+	log.WithFields(map[string]interface{}{
 		"id":        deployment.ID,
 		"module_id": deployment.ModuleID,
 		"env":       deployment.Environment,
@@ -289,7 +288,7 @@ func (h *Handler) UpdateDeploymentStatus(c *gin.Context) {
 		return
 	}
 
-	log.WithFields(gin.H{
+	log.WithFields(map[string]interface{}{
 		"id":     id,
 		"status": body.Status,
 	}).Info("deployment status updated")

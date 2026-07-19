@@ -29,8 +29,8 @@ func Connect(cfg *config.DatabaseConfig) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	sqlDB.SetMaxOpenConns(cfg.MaxConns)
-	sqlDB.SetMaxIdleConns(cfg.MinConns)
+	sqlDB.SetMaxOpenConns(int(cfg.MaxConns))
+	sqlDB.SetMaxIdleConns(int(cfg.MinConns))
 	sqlDB.SetConnMaxLifetime(cfg.MaxLifetime)
 
 	// Verify connectivity
