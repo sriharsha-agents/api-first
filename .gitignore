@@ -10,6 +10,9 @@
 dist/
 build/
 
+# Go backup files
+go.sum_bk
+
 # Dependencies
 vendor/
 
@@ -38,3 +41,22 @@ coverage/
 # Temporary files
 tmp/
 temp/
+
+# =============================================
+# Phase 4: Git Security - License & Key Protection
+# =============================================
+
+# Private signing keys - NEVER COMMIT
+*.pem
+*.key
+private.pem
+
+# Generated license files (delivered to customers, not stored in repo)
+*.lic
+
+# License output directory
+/licenses/output/
+
+# Environment files containing signing secrets
+.env.signing
+.env.production

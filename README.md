@@ -200,6 +200,8 @@ Customise via `deploy/helm/api-first/values.yaml` or pass `-f custom-values.yaml
 
 ---
 
-## License
 
-Internal use only. © 2025
+## Licensing
+- **Community Edition**: Licensed under Apache 2.0. Free for internal use.
+- **Enterprise Edition**: Requires a commercial license. Features include [HA Clustering, Audit Logs].
+- **Air-Gapped**: License validation occurs entirely offline via signed cryptographic files. No data ever leaves your network.

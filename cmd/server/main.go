@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,6 +15,7 @@ import (
 	"api-first/internal/handler"
 	"api-first/internal/logger"
 	"api-first/internal/models"
+	"api-first/pkg/license"
 
 	"github.com/gin-gonic/gin"
 )
@@ -25,6 +27,24 @@ var (
 )
 
 func main() {
+	// =============================================
+	// Phase 2.4: License Enforcement on Startup
+	// Validate the offline license before starting the API server.
+	// =============================================
+	licensePath := os.Getenv("LICENSE_FILE_PATH")
+	if licensePath == "" {
+		licensePath = "/etc/myapp/license.lic"
+	}
+
+	lic, err := license.ValidateLicenseFile(licensePath)
+	if err != nil {
+		log.Fatalf("🚨 LICENSE ERROR: %v", err)
+	}
+
+	log.Printf("✅ License validated for: %s", lic.Customer)
+	log.Printf("✅ Features enabled: %v", lic.Features)
+	log.Printf("✅ Max Instances: %d", lic.MaxInstances)
+
 	log := logger.Logger()
 
 	// Load all configuration from environment variables (zero hardcoded configs).
