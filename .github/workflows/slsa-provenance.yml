@@ -1,0 +1,51 @@
+name: SLSA provenance generator
+
+on:
+  workflow_call:
+    inputs:
+      provenance-name:
+        required: false
+        type: string
+        default: 'intoto.json'
+    outputs:
+      provenance-digest:
+        description: "SHA256 digest of the provenance"
+        value: ${{ jobs.generate.outputs.provenance-digest }}
+      provenance-filename:
+        description: "Name of the provenance file"
+        value: ${{ inputs.provenance-name }}
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    outputs:
+      provenance-digest: ${{ steps.hash.outputs.digest }}
+    steps:
+      - name: Generate build metadata
+        id: build-metadata
+        uses: slsa-framework/slsa-github-generator/.github/build-metadata/actions@v2.0.0
+
+      - name: Generate provenance
+        uses: slsa-framework/slsa-github-generator/.github/inspector/actions@v2.0.0
+        with:
+          build-metadata: ${{ steps.build-metadata.outputs.metadata }}
+          provenance-name: ${{ inputs.provenance-name }}
+
+      - name: Hash provenance
+        id: hash
+        run: |
+          echo "digest=$(sha256sum ${{ inputs.provenance-name }} | cut -d' ' -f1)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: provenance
+          path: ${{ inputs.provenance-name }}
+          retention-days: 5

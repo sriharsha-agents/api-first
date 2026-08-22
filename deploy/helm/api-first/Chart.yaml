@@ -1,0 +1,6 @@
+apiVersion: v2
+name: api-first
+description: Enterprise air-gapped API module for Kubernetes (no data leaves the boundary)
+type: application
+version: 0.1.0
+appVersion: "0.1.0"

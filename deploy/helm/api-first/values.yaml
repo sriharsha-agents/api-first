@@ -1,0 +1,97 @@
+replicaCount: 2
+
+image:
+  repository: api-first
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+service:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: api-first.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+
+livenessProbe:
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /readyz
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 5
+
+env:
+  SERVER_PORT: "8080"
+  SERVER_READ_TIMEOUT: "5s"
+  SERVER_WRITE_TIMEOUT: "10s"
+  SERVER_SHUTDOWN_TIMEOUT: "5s"
+  LOG_LEVEL: "info"
+
+database:
+  host: ""
+  port: 5432
+  user: ""
+  password: ""
+  name: apifirst
+  sslmode: disable
+  maxConns: 25
+  minConns: 2
+  maxLifetime: "3600s"
+
+redis:
+  addr: ""
+  db: 0
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
